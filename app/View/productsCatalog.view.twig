@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container text-right">
+        {% if user is empty %}
+            <p class="container text-end"><a href="/login">Login</a></p>
+                    {% else %}
+            <p class="container text-end"><a href="/user">{{ user }}</a></p>
+        {% endif %}
+    </div>
+{% endblock %}
+
+    {% block body %}
+
+
+        <div class="container text-center">
+            <h1>Product Catalog</h1><br>
+        </div>
+        <div class="container text-center">
+            <h5><a href="/createNew">Create New Product</a></h5>
+        </div>
+        <div class="container text-center">
+            <form action="/filter">
+                <label for="number">Filter Category:</label>
+                <select id="category" name="category">
+                    <option value="all">All</option>
+                    <option value="Footwear">Footwear</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Accessories">Accessories</option>
+                </select>
+                <input type="submit" id="filter" name="filter" value="Filter">
+            </form>
+        </div>
+        <br><br>
+        <table class="table container">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Date Added</th>
+                <th scope="col">Date Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for product in products %}
+                <tr>
+                    <th scope="row"><a href="/products/{{ product.getName }}">
+                            {{ product.getName }}
+                        </a></th>
+                    <td>{{ product.getCategory }}</td>
+                    <td>{{ product.getQuantity }}</td>
+                    <td>{{ product.getDateAdded }}</td>
+                    <td>{{ product.getDateUpdated }}</td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    {% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+        <p class="text-center h3 fw-bold mb-5 mx-1 mx-md-4 mt-4">Your Information</p>
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">Name: {{ user.getName }}</p>
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">Email: {{ user.getEmail }}</p>
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">Password: ***********</p>
+        <form class="mx-1 mx-md-4" method="post" action="">
+            <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                <input type="submit" id="logOut" name="logOut" class="btn btn-primary btn-lg" value="Log Out"/>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}
+

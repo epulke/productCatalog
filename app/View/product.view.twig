@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+        <p class="text-center h3 fw-bold mb-5 mx-1 mx-md-4 mt-4">Product Information</p>
+        <p class="text-right mb-5 mx-1 mx-md-4 mt-4"><b>Name:</b> {{ product.getName }}</p>
+        <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Category:</b> {{ product.getCategory }}</p>
+        <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Quantity:</b> {{ product.getQuantity }}</p>
+        <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Date Added:</b> {{ product.getDateAdded }}</p>
+        <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Date Updated:</b> {{ product.getDateUpdated }}</p>
+        <form class="mx-1 mx-md-4" method="post" action="/products/{{ product.getName }}">
+            <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                <input type="submit"  id="delete" name="delete" class="btn btn-primary btn-lg" value="Delete"/>
+
+{#                <button onclick="confirm()" id="delete" name="delete" class="btn btn-primary btn-lg">#}
+{#                    Delete#}
+{#                </button>#}
+{#                <script>#}
+{#                    function confirm() {#}
+{#                        confirm("Press ok to confirm deletion!");#}
+{#                    }#}
+{#                </script>#}
+            </div>
+
+        </form>
+        <form class="mx-1 mx-md-4" method="get" action="/products/{{ product.getName }}/edit">
+            <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                <input type="submit"  id="edit" name="edit" class="btn btn-primary btn-lg" value="Edit"/>
+            </div>
+
+        </form>
+
+
+    </div>
+
+{% endblock %}
