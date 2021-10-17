@@ -1,15 +1,5 @@
 {% extends "base.html" %}
 
-{% block content %}
-    <div class="container text-right">
-        {% if user is empty %}
-            <p class="container text-end"><a href="/login">Login</a></p>
-                    {% else %}
-            <p class="container text-end"><a href="/user">{{ user }}</a></p>
-        {% endif %}
-    </div>
-{% endblock %}
-
     {% block body %}
 
 

@@ -24,8 +24,13 @@ class ProductsController
 
     public function index(): View
     {
-        $products = $this->repository->downloadProducts();
-        (Auth::user() !== null) ? $user = Auth::user()->getName() : $user = null;
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+
+        if ($user === null)
+        {
+            Redirect::url("/pleaseLogIn");
+        }
+        $products = $this->repository->downloadProducts(Auth::user()->getId());
 
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
@@ -35,8 +40,12 @@ class ProductsController
 
     public function showProduct($vars): View
     {
-        $product = $this->repository->searchProduct($vars["id"]);
-        return new View("product.view.twig", ["product" => $product]);
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+        $product = $this->repository->searchProduct($vars["id"], $user->getId());
+        return new View("product.view.twig", [
+            "product" => $product,
+            "user" => $user
+        ]);
     }
 
     public function createNewForm(): View
@@ -46,13 +55,16 @@ class ProductsController
 
     public function saveProduct(): void
     {
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+
         try {
             $this->validator->productFieldsValidation($_POST);
             $product = new Product(
                 $_POST["name"],
                 $_POST["category"],
                 $_POST["quantity"],
-                Carbon::now()->toDateTimeString()
+                Carbon::now()->toDateTimeString(),
+                $user->getId()
             );
 
             $this->repository->saveProduct($product);
@@ -67,13 +79,18 @@ class ProductsController
 
     public function deleteProduct($vars)
     {
-        $this->repository->deleteProduct($vars["id"]);
-        Redirect::url("/products");
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+        if ($_POST["delete"] === "Delete")
+        {
+            $this->repository->deleteProduct($vars["id"], $user->getId());
+            Redirect::url("/products");
+        }
     }
 
     public function showEditView($vars): View
     {
-        $product = $this->repository->searchProduct($vars["id"]);
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+        $product = $this->repository->searchProduct($vars["id"], $user->getId());
         return new View("productEdit.view.twig", [
             "product" => $product,
             "errors" => $_SESSION["_errors"] ?? null
@@ -82,16 +99,11 @@ class ProductsController
 
     public function editProduct($vars)
     {
-        $this->repository->searchProduct($vars["id"]);
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+        $this->repository->searchProduct($vars["id"], $user->getId());
         try {
             $this->validator->productFieldsValidation($_POST);
-            $this->repository->editProduct(
-                $vars["id"],
-                $_POST["name"],
-                $_POST["category"],
-                $_POST["quantity"],
-                Carbon::now()->toDateTimeString()
-            );
+            $this->repository->editProduct($vars["id"], $_POST, $user->getId());
             Redirect::url("/products");
         } catch (ProductValidationException $exception) {
             $_SESSION["_errors"] = $this->validator->getErrors();
@@ -102,7 +114,17 @@ class ProductsController
 
     public function showFilterView(): View
     {
-        $products = $this->repository->downloadProducts($_GET["category"]);
-        return new View("productsCatalog.view.twig", ["products" => $products->getProducts()]);
+        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+        $products = $this->repository->downloadProducts($user->getId() ,$_GET["category"]);
+        return new View("productsCatalog.view.twig", [
+            "products" => $products->getProducts(),
+            "user" => $user
+        ]);
+    }
+
+    public function pleaseView(): View
+    {
+//        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
+            return new View("pleaseLogIn.view.twig", []);
     }
 }

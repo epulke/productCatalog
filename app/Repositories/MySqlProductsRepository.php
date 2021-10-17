@@ -22,13 +22,15 @@ class MySqlProductsRepository implements ProductsRepository
         );
     }
 
-    public function downloadProducts(?string $category = null): ProductsCollection
+    public function downloadProducts(string $userId, ?string $category = null): ProductsCollection
     {
         if (is_null($category) || $category === "all")
         {
-            $statement = $this->connection->prepare("select * from products");
+            $statement = $this->connection->prepare("select * from products where userId='{$userId}'");
         } else {
-            $statement = $this->connection->prepare("select * from products where category='{$category}'");
+            $statement = $this->connection->prepare(
+                "select * from products where category='{$category}' and userId='{$userId}'"
+            );
         }
 
         $statement->execute();
@@ -43,15 +45,18 @@ class MySqlProductsRepository implements ProductsRepository
                 $item["category"],
                 $item["quantity"],
                 $item["dateAdded"],
+                $item["userId"],
                 $item["dateUpdated"]
             ));
         }
         return $collection;
     }
 
-    public function searchProduct(string $name): Product
+    public function searchProduct(string $name, string $userId): Product
     {
-        $statement = $this->connection->prepare("select * from products where name='{$name}'");
+        $statement = $this->connection->prepare(
+            "select * from products where name='{$name}' and userId='{$userId}'"
+        );
         $statement->execute();
         $item = $statement->fetch();
 
@@ -60,6 +65,7 @@ class MySqlProductsRepository implements ProductsRepository
             $item["category"],
             $item["quantity"],
             $item["dateAdded"],
+            $item["userId"],
             $item["dateUpdated"]
         );
     }
@@ -70,30 +76,33 @@ class MySqlProductsRepository implements ProductsRepository
                       name, 
                       category, 
                       quantity, 
-                      dateAdded
+                      dateAdded,
+                      userId
                       ) values (
                                 :name, 
                                 :category, 
                                 :quantity, 
-                                :dateAdded
+                                :dateAdded,
+                                :userId
                       )");
         $statement->execute([
             ":name" => $product->getName(),
             ":category" => $product->getCategory(),
             ":quantity" => $product->getQuantity(),
-            ":dateAdded" => $product->getDateAdded()
+            ":dateAdded" => $product->getDateAdded(),
+            ":userId" => $product->getUserId()
         ]);
     }
 
-    public function deleteProduct(string $name): void
+    public function deleteProduct(string $name, string $userId): void
     {
-        $statement = $this->connection->prepare("delete from products where name='{$name}'");
+        $statement = $this->connection->prepare("delete from products where name='{$name}' and userId='{$userId}'");
         $statement->execute();
     }
 
-    public function editProduct(string $searchName, string $name, string $category, int $quantity, string $dateUpdated): void
+    public function editProduct(string $searchName, array $data, string $userId): void
     {
-        $statement = $this->connection->prepare("select * from products where name='{$searchName}'");
+        $statement = $this->connection->prepare("select * from products where name='{$searchName}' and userId='{$userId}'");
         $statement->execute();
         $item = $statement->fetch();
         $id = $item["id"];
@@ -104,10 +113,10 @@ class MySqlProductsRepository implements ProductsRepository
                     quantity=(:quantity),
                     dateUpdated=(:dateUpdated) where id=(:id)");
         $statement->execute([
-            ":name" => $name,
-            ":category" => $category,
-            ":quantity" => $quantity,
-            ":dateUpdated" => $dateUpdated,
+            ":name" => $data["name"],
+            ":category" => $data["category"],
+            ":quantity" => $data["quantity"],
+            ":dateUpdated" => Carbon::now()->toDateTimeString(),
             ":id" => $id
         ]);
     }

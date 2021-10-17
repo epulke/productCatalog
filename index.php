@@ -1,18 +1,17 @@
 <?php
 
-
 use App\View;
-use Carbon\Carbon;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 require_once "vendor/autoload.php";
-require_once "Dump.php";
 
 session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/products', 'ProductsController@index');
+
+    $r->addRoute('GET', '/pleaseLogIn', 'ProductsController@pleaseView');
 
     $r->addRoute('GET', '/createNew', 'ProductsController@createNewForm');
     $r->addRoute('POST', '/createNew', 'ProductsController@saveProduct');

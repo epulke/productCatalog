@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <section class="vh-100" style="background-color: #eee;">
@@ -16,6 +15,25 @@
                     <div class="card-body p-md-5">
                         <div class="row justify-content-center">
                             {% block content %}
+                            <nav class="navbar navbar-expand-lg navbar-light">
+                                <div class="collapse navbar-collapse" id="navbarNav">
+                                    <ul class="navbar-nav">
+                                        <li class="nav-item active">
+                                            <a class="nav-link" href="/register">Register</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="/products">Products</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            {% if user is empty %}
+                                            <a class="nav-link" href="/login">Login</a>
+                                            {% else %}
+                                            <a class="nav-link" href="/user"> {{ user.getName }} </a>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
                             {% endblock %}
 
                             {% block errors %}
@@ -24,11 +42,6 @@
                                     <p class='text-center text-danger'>{{ error }}</p>
                                 {% endfor %}
                             {% endif %}
-<!--                                {% if errors is defined %}-->
-<!--                                    {% for error in errors %}-->
-<!--                                        <p class='text-center text-danger'>{{ error }}</p>-->
-<!--                                    {% endfor %}-->
-<!--                                {% endif %}-->
                             {% endblock %}
 
                             {% block body %}
@@ -43,5 +56,6 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
 </section>
 </html>

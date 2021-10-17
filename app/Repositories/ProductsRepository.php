@@ -7,9 +7,9 @@ use App\Model\Product;
 
 interface ProductsRepository
 {
-    public function downloadProducts(?string $category): ProductsCollection;
-    public function searchProduct(string $name): Product;
+    public function downloadProducts(string $userId, ?string $category = null): ProductsCollection;
+    public function searchProduct(string $name, string $userId): Product;
     public function saveProduct(Product $product): void;
-    public function deleteProduct(string $name): void;
-    public function editProduct(string $searchName, string $name, string $category, int $quantity, string $dateUpdated): void;
+    public function deleteProduct(string $name, string $userId): void;
+    public function editProduct(string $searchName, array $data, string $userId): void;
 }

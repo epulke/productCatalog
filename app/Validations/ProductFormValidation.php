@@ -20,6 +20,12 @@ class ProductFormValidation
             $this->errors[] = "Please fill in all fields!";
         }
 
+        $quantity = (int) $data["quantity"];
+        if ($quantity <= 0)
+        {
+            $this->errors[] = "Quantity should be number and it should be greater than 0.";
+        }
+
         $category = ["Footwear", "Clothing", "Accessories"];
         if (!in_array($data["category"], $category))
         {
