@@ -18,6 +18,12 @@
                     <option value="Clothing">Clothing</option>
                     <option value="Accessories">Accessories</option>
                 </select>
+                <br>
+                {% for tag in tags %}
+                    <input type="checkbox" id="vehicle1" name="{{ tag.getName }}" value="{{ tag.getId }}">
+                    <label for="{{ tag.getName }}"> {{ tag.getName }}</label>
+                {% endfor %}
+                <br>
                 <input type="submit" id="filter" name="filter" value="Filter">
             </form>
         </div>

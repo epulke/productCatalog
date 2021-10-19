@@ -10,6 +10,7 @@ class Product
     private string $dateAdded;
     private ?string $dateUpdated = null;
     private string $userId;
+    private ?string $productId;
 
     public function __construct(
         string $name,
@@ -17,7 +18,8 @@ class Product
         int $quantity,
         string $dateAdded,
         string $userId,
-        ?string $dateUpdated = null
+        ?string $dateUpdated = null,
+        ?string $productId = null
     )
     {
         $this->name = $name;
@@ -26,6 +28,7 @@ class Product
         $this->dateAdded = $dateAdded;
         $this->dateUpdated = $dateUpdated;
         $this->userId = $userId;
+        $this->productId = $productId;
     }
 
     public function getName(): string
@@ -56,6 +59,11 @@ class Product
     public function getDateUpdated(): ?string
     {
         return $this->dateUpdated;
+    }
+
+    public function getProductId(): ?string
+    {
+        return $this->productId;
     }
 
     public function setDateUpdated(string $dateUpdated): void

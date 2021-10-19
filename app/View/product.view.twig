@@ -9,9 +9,16 @@
         <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Quantity:</b> {{ product.getQuantity }}</p>
         <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Date Added:</b> {{ product.getDateAdded }}</p>
         <p class="text-right  mb-5 mx-1 mx-md-4 mt-4"><b>Date Updated:</b> {{ product.getDateUpdated }}</p>
+        {% for tag in tags %}
+        <ul>
+            <li>{{ tag.getName }}</li>
+        </ul>
+        {% endfor %}
+        </p>
         <form class="mx-1 mx-md-4" method="post" action="/products/{{ product.getName }}">
             <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                <input type="submit" onclick="return confirm('Press ok to confirm deletion!')" name="delete" value="Delete" class="btn btn-primary btn-lg">
+                <input type="submit" onclick="return confirm('Press ok to confirm deletion!')" name="delete"
+                       value="Delete" class="btn btn-primary btn-lg">
             </div>
 
         </form>

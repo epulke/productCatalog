@@ -7,19 +7,26 @@ use App\Exceptions\ProductValidationException;
 use App\Model\Product;
 use App\Redirect;
 use App\Repositories\MySqlProductsRepository;
+use App\Repositories\MySqlProductsTagsRepository;
+use App\Repositories\MySqlTagsRepository;
 use App\Validations\ProductFormValidation;
 use App\View;
 use Carbon\Carbon;
+use Ramsey\Uuid\Uuid;
 
 class ProductsController
 {
-    private MySqlProductsRepository $repository;
+    private MySqlProductsRepository $productsRepository;
     private ProductFormValidation $validator;
+    private MySqlProductsTagsRepository $productsTagsRepository;
+    private MySqlTagsRepository $tagsRepository;
 
     public function __construct()
     {
-        $this->repository = new MySqlProductsRepository();
+        $this->productsRepository = new MySqlProductsRepository();
         $this->validator = new ProductFormValidation();
+        $this->productsTagsRepository = new MySqlProductsTagsRepository();
+        $this->tagsRepository = new MySqlTagsRepository();
     }
 
     public function index(): View
@@ -28,23 +35,27 @@ class ProductsController
 
         if ($user === null)
         {
-            Redirect::url("/pleaseLogIn");
+            Redirect::url("/login");
         }
-        $products = $this->repository->downloadProducts(Auth::user()->getId());
+        $products = $this->productsRepository->downloadProducts(Auth::user()->getId());
 
+        $tags = $this->tagsRepository->getTags();
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
-            "user" => $user
+            "user" => $user,
+            "tags" => $tags->getTags()
             ]);
     }
 
     public function showProduct($vars): View
     {
         (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $product = $this->repository->searchProduct($vars["id"], $user->getId());
+        $product = $this->productsRepository->searchProduct($vars["id"], $user->getId());
+        $tags = $this->productsTagsRepository->searchByProductId($product->getProductId());
         return new View("product.view.twig", [
             "product" => $product,
-            "user" => $user
+            "user" => $user,
+            "tags" => $tags->getTags()
         ]);
     }
 
@@ -64,10 +75,12 @@ class ProductsController
                 $_POST["category"],
                 $_POST["quantity"],
                 Carbon::now()->toDateTimeString(),
-                $user->getId()
+                $user->getId(),
+                null,
+                Uuid::uuid4()->toString()
             );
 
-            $this->repository->saveProduct($product);
+            $this->productsRepository->saveProduct($product);
 
             Redirect::url("/products");
         } catch (ProductValidationException $exception) {
@@ -82,7 +95,7 @@ class ProductsController
         (Auth::user() !== null) ? $user = Auth::user() : $user = null;
         if ($_POST["delete"] === "Delete")
         {
-            $this->repository->deleteProduct($vars["id"], $user->getId());
+            $this->productsRepository->deleteProduct($vars["id"], $user->getId());
             Redirect::url("/products");
         }
     }
@@ -90,7 +103,7 @@ class ProductsController
     public function showEditView($vars): View
     {
         (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $product = $this->repository->searchProduct($vars["id"], $user->getId());
+        $product = $this->productsRepository->searchProduct($vars["id"], $user->getId());
         return new View("productEdit.view.twig", [
             "product" => $product,
             "errors" => $_SESSION["_errors"] ?? null
@@ -100,10 +113,10 @@ class ProductsController
     public function editProduct($vars)
     {
         (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $this->repository->searchProduct($vars["id"], $user->getId());
+        $this->productsRepository->searchProduct($vars["id"], $user->getId());
         try {
             $this->validator->productFieldsValidation($_POST);
-            $this->repository->editProduct($vars["id"], $_POST, $user->getId());
+            $this->productsRepository->editProduct($vars["id"], $_POST, $user->getId());
             Redirect::url("/products");
         } catch (ProductValidationException $exception) {
             $_SESSION["_errors"] = $this->validator->getErrors();
@@ -115,16 +128,21 @@ class ProductsController
     public function showFilterView(): View
     {
         (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $products = $this->repository->downloadProducts($user->getId() ,$_GET["category"]);
+        $tags = $this->tagsRepository->getTags();
+        $selectedTags = [];
+        foreach($tags->getTags() as $tag)
+        {
+            if (in_array((string)$tag->getId(), $_GET))
+            {
+                $selectedTags[] = $tag->getId();
+            }
+        }
+
+        $products = $this->productsRepository->downloadProducts($user->getId() ,$_GET["category"], $selectedTags);
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
-            "user" => $user
+            "user" => $user,
+            "tags" => $tags->getTags()
         ]);
-    }
-
-    public function pleaseView(): View
-    {
-//        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-            return new View("pleaseLogIn.view.twig", []);
     }
 }
