@@ -31,30 +31,23 @@ class ProductsController
 
     public function index(): View
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-
-        if ($user === null)
-        {
-            Redirect::url("/login");
-        }
         $products = $this->productsRepository->downloadProducts(Auth::user()->getId());
 
         $tags = $this->tagsRepository->getTags();
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
-            "user" => $user,
+            "user" => Auth::user(),
             "tags" => $tags->getTags()
             ]);
     }
 
     public function showProduct($vars): View
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $product = $this->productsRepository->searchProduct($vars["id"], $user->getId());
+        $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
         $tags = $this->productsTagsRepository->searchByProductId($product->getProductId());
         return new View("product.view.twig", [
             "product" => $product,
-            "user" => $user,
+            "user" => Auth::user(),
             "tags" => $tags->getTags()
         ]);
     }
@@ -66,8 +59,6 @@ class ProductsController
 
     public function saveProduct(): void
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-
         try {
             $this->validator->productFieldsValidation($_POST);
             $product = new Product(
@@ -75,7 +66,7 @@ class ProductsController
                 $_POST["category"],
                 $_POST["quantity"],
                 Carbon::now()->toDateTimeString(),
-                $user->getId(),
+                Auth::user()->getId(),
                 null,
                 Uuid::uuid4()->toString()
             );
@@ -92,18 +83,16 @@ class ProductsController
 
     public function deleteProduct($vars)
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
         if ($_POST["delete"] === "Delete")
         {
-            $this->productsRepository->deleteProduct($vars["id"], $user->getId());
+            $this->productsRepository->deleteProduct($vars["id"], Auth::user()->getId());
             Redirect::url("/products");
         }
     }
 
     public function showEditView($vars): View
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $product = $this->productsRepository->searchProduct($vars["id"], $user->getId());
+        $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
         return new View("productEdit.view.twig", [
             "product" => $product,
             "errors" => $_SESSION["_errors"] ?? null
@@ -112,11 +101,10 @@ class ProductsController
 
     public function editProduct($vars)
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
-        $this->productsRepository->searchProduct($vars["id"], $user->getId());
+        $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
         try {
             $this->validator->productFieldsValidation($_POST);
-            $this->productsRepository->editProduct($vars["id"], $_POST, $user->getId());
+            $this->productsRepository->editProduct($vars["id"], $_POST, Auth::user()->getId());
             Redirect::url("/products");
         } catch (ProductValidationException $exception) {
             $_SESSION["_errors"] = $this->validator->getErrors();
@@ -127,7 +115,6 @@ class ProductsController
 
     public function showFilterView(): View
     {
-        (Auth::user() !== null) ? $user = Auth::user() : $user = null;
         $tags = $this->tagsRepository->getTags();
         $selectedTags = [];
         foreach($tags->getTags() as $tag)
@@ -138,10 +125,10 @@ class ProductsController
             }
         }
 
-        $products = $this->productsRepository->downloadProducts($user->getId() ,$_GET["category"], $selectedTags);
+        $products = $this->productsRepository->downloadProducts(Auth::user()->getId() ,$_GET["category"], $selectedTags);
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
-            "user" => $user,
+            "user" => Auth::user(),
             "tags" => $tags->getTags()
         ]);
     }

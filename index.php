@@ -62,6 +62,18 @@ switch ($routeInfo[0]) {
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
 
+        $middlewares = require "app/middlewares.php";
+
+        if (isset($middlewares[$handler]))
+        {
+            foreach ($middlewares[$handler] as $middleware)
+            {
+                $middleware = new $middleware;
+                $middleware->handle();
+            }
+        }
+
+
         [$handler, $method] = explode("@", $handler);
         $path = "App\Controllers\\" . $handler;
         $controller = new $path();
