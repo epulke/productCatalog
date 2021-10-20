@@ -2,6 +2,9 @@
 
 use App\Middleware\LoggedInMiddleware;
 use App\Middleware\AuthorizedMiddleware;
+use App\Middleware\ProductFormValidationMiddleware;
+use App\Middleware\UserLoginValidationMiddleware;
+use App\Middleware\UserRegistrationValidationMiddleware;
 
 return [
     'ProductsController@index' => [
@@ -13,7 +16,8 @@ return [
     ],
 
     'ProductsController@saveProduct' => [
-        AuthorizedMiddleware::class
+        AuthorizedMiddleware::class,
+        ProductFormValidationMiddleware::class
     ],
 
     'ProductsController@createNewForm' => [
@@ -29,7 +33,8 @@ return [
     ],
 
     'ProductsController@editProduct' => [
-        AuthorizedMiddleware::class
+        AuthorizedMiddleware::class,
+        ProductFormValidationMiddleware::class
     ],
 
     'ProductsController@showFilterView' => [
@@ -41,7 +46,8 @@ return [
     ],
 
     'UsersController@registerUser' => [
-        LoggedInMiddleware::class
+        LoggedInMiddleware::class,
+        UserRegistrationValidationMiddleware::class
     ],
 
     'UsersController@logInView' => [
@@ -49,7 +55,8 @@ return [
     ],
 
     'UsersController@logInUser' => [
-        LoggedInMiddleware::class
+        LoggedInMiddleware::class,
+        UserLoginValidationMiddleware::class
     ],
 
     'UsersController@userInfo' => [

@@ -33,8 +33,9 @@ class Auth
         return self::$authUser;
     }
 
-    public static function unset(): void
+    public static function logOut(): void
     {
+        unset($_SESSION["userId"]);
         if (self::$authUser !== null) self::$authUser = null;
     }
 }

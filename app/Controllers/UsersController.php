@@ -29,21 +29,14 @@ class UsersController
 
     public function registerUser()
     {
-        try {
-            $this->validation->registryFieldsValidation($_POST);
-            $user = new User(
-                Uuid::uuid4()->toString(),
-                $_POST["name"],
-                $_POST["email"],
-                password_hash($_POST["password"], PASSWORD_DEFAULT)
-            );
-            $this->repository->addUser($user);
-            Redirect::url("/login");
-        } catch (UserValidationException $exception){
-            $_SESSION["_errors"] = $this->validation->getErrors();
-            Redirect::url("/register");
-            exit;
-        }
+        $user = new User(
+            Uuid::uuid4()->toString(),
+            $_POST["name"],
+            $_POST["email"],
+            password_hash($_POST["password"], PASSWORD_DEFAULT)
+        );
+        $this->repository->addUser($user);
+        Redirect::url("/login");
     }
 
     public function logInView(): View
@@ -53,28 +46,19 @@ class UsersController
 
     public function logInUser()
     {
-        try {
-            $this->validation->logInValidation($_POST);
-            $user = $this->repository->findByEmail($_POST["email"]);
-            $_SESSION["userId"] = $user->getId();
-            Redirect::url("/products");
-        } catch (UserValidationException $exception) {
-            $_SESSION["_errors"] = $this->validation->getErrors();
-            Redirect::url("/login");
-            exit;
-        }
+        $user = $this->repository->findByEmail($_POST["email"]);
+        $_SESSION["userId"] = $user->getId();
+        Redirect::url("/products");
     }
 
     public function userInfo(): View
     {
-        $user = Auth::user();
-        return new View("userInfo.twig", ["user" => $user]);
+        return new View("userInfo.twig", ["user" => Auth::user()]);
     }
 
     public function userLogOut()
     {
-        unset($_SESSION["userId"]);
-        Auth::unset();
+        Auth::logOut();
         Redirect::url("/login");
     }
 }

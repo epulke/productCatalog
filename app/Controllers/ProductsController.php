@@ -38,7 +38,7 @@ class ProductsController
             "products" => $products->getProducts(),
             "user" => Auth::user(),
             "tags" => $tags->getTags()
-            ]);
+        ]);
     }
 
     public function showProduct($vars): View
@@ -59,32 +59,24 @@ class ProductsController
 
     public function saveProduct(): void
     {
-        try {
-            $this->validator->productFieldsValidation($_POST);
-            $product = new Product(
-                $_POST["name"],
-                $_POST["category"],
-                $_POST["quantity"],
-                Carbon::now()->toDateTimeString(),
-                Auth::user()->getId(),
-                null,
-                Uuid::uuid4()->toString()
-            );
+        $product = new Product(
+            $_POST["name"],
+            $_POST["category"],
+            $_POST["quantity"],
+            Carbon::now()->toDateTimeString(),
+            Auth::user()->getId(),
+            null,
+            Uuid::uuid4()->toString()
+        );
 
-            $this->productsRepository->saveProduct($product);
+        $this->productsRepository->saveProduct($product);
 
-            Redirect::url("/products");
-        } catch (ProductValidationException $exception) {
-            $_SESSION["_errors"] = $this->validator->getErrors();
-            Redirect::url("/createNew");
-            exit;
-        }
+        Redirect::url("/products");
     }
 
     public function deleteProduct($vars)
     {
-        if ($_POST["delete"] === "Delete")
-        {
+        if ($_POST["delete"] === "Delete") {
             $this->productsRepository->deleteProduct($vars["id"], Auth::user()->getId());
             Redirect::url("/products");
         }
@@ -102,30 +94,23 @@ class ProductsController
     public function editProduct($vars)
     {
         $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
-        try {
-            $this->validator->productFieldsValidation($_POST);
-            $this->productsRepository->editProduct($vars["id"], $_POST, Auth::user()->getId());
-            Redirect::url("/products");
-        } catch (ProductValidationException $exception) {
-            $_SESSION["_errors"] = $this->validator->getErrors();
-            Redirect::url("/products/{$vars['id']}/edit");
-            exit;
-        }
+
+        $this->validator->productFieldsValidation($_POST);
+        $this->productsRepository->editProduct($vars["id"], $_POST, Auth::user()->getId());
+        Redirect::url("/products");
     }
 
     public function showFilterView(): View
     {
         $tags = $this->tagsRepository->getTags();
         $selectedTags = [];
-        foreach($tags->getTags() as $tag)
-        {
-            if (in_array((string)$tag->getId(), $_GET))
-            {
+        foreach ($tags->getTags() as $tag) {
+            if (in_array((string)$tag->getId(), $_GET)) {
                 $selectedTags[] = $tag->getId();
             }
         }
 
-        $products = $this->productsRepository->downloadProducts(Auth::user()->getId() ,$_GET["category"], $selectedTags);
+        $products = $this->productsRepository->downloadProducts(Auth::user()->getId(), $_GET["category"], $selectedTags);
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
             "user" => Auth::user(),

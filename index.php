@@ -73,7 +73,6 @@ switch ($routeInfo[0]) {
             }
         }
 
-
         [$handler, $method] = explode("@", $handler);
         $path = "App\Controllers\\" . $handler;
         $controller = new $path();
