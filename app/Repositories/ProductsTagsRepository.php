@@ -6,5 +6,5 @@ use App\Model\Collections\TagsCollection;
 
 interface ProductsTagsRepository
 {
-    public function searchByProductId(int $productId): TagsCollection;
+    public function searchByProductId(string $productId): TagsCollection;
 }

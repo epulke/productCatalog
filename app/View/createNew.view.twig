@@ -16,6 +16,10 @@
             </select><br>
             <label for="quantity" class="text-right mb-5 mx-1 mx-md-4 mt-4"><b>Quantity:</b></label>
             <input type="text" id="quantity" name="quantity" required><br>
+            {% for tag in tags %}
+                <input type="checkbox" id="vehicle1" name="{{ tag.getName }}" value="{{ tag.getId }}">
+                <label for="{{ tag.getName }}"> {{ tag.getName }}</label><br>
+            {% endfor %}
             <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                 <input type="submit" id="submit" name="submit" value="Save" class="btn btn-primary btn-lg"><br><br>
             </div>

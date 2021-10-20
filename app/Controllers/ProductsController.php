@@ -54,7 +54,11 @@ class ProductsController
 
     public function createNewForm(): View
     {
-        return new View("createNew.view.twig", ["errors" => $_SESSION["_errors"] ?? null]);
+        $tags = $this->tagsRepository->getTags();
+        return new View("createNew.view.twig", [
+            "errors" => $_SESSION["_errors"] ?? null,
+            "tags" => $tags->getTags()
+        ]);
     }
 
     public function saveProduct(): void
@@ -68,9 +72,16 @@ class ProductsController
             null,
             Uuid::uuid4()->toString()
         );
-
         $this->productsRepository->saveProduct($product);
 
+        $tags = $this->tagsRepository->getTags();
+        $selectedTags = [];
+        foreach ($tags->getTags() as $tag) {
+            if (in_array((string)$tag->getId(), $_POST)) {
+                $selectedTags[] = $tag->getId();
+            }
+        }
+        $this->productsTagsRepository->saveProductsTags($product, $selectedTags);
         Redirect::url("/products");
     }
 

@@ -87,7 +87,7 @@ class MySqlProductsRepository implements ProductsRepository
             $item["dateAdded"],
             $item["userId"],
             $item["dateUpdated"],
-            $item["id"]
+            $item["productId"]
         );
     }
 

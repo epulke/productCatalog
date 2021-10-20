@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Model\Collections\TagsCollection;
+use App\Model\Product;
 use App\Model\Tag;
 use PDO;
 
@@ -21,7 +22,7 @@ class MySqlProductsTagsRepository implements ProductsTagsRepository
         );
     }
 
-    public function searchByProductId(int $productId): TagsCollection
+    public function searchByProductId(string $productId): TagsCollection
     {
         $statement = $this->connection->prepare(
             "select * from productsTags p left join tags t on p.tagId=t.id where p.productId='{$productId}'"
@@ -40,5 +41,20 @@ class MySqlProductsTagsRepository implements ProductsTagsRepository
             );
         }
         return $collection;
+    }
+
+    public function saveProductsTags(Product $product, array $tags)
+    {
+        foreach ($tags as $tag)
+        {
+            $statement = $this->connection->prepare(
+                "insert into productsTags (productId, tagId) 
+                    values (:productId, :tagId)");
+            $statement->execute([
+                ":productId" => $product->getProductId(),
+                ":tagId" => $tag
+            ]);
+        }
+
     }
 }
