@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Model\User;
-use App\Repositories\MySqlUsersRepository;
+use App\Repositories\Users\MySqlUsersRepository;
 
 class Auth
 {

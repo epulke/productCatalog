@@ -12,7 +12,6 @@ class LoggedInMiddleware implements Middleware
         if (Auth::loggedIn())
         {
             Redirect::url("/products");
-            exit;
         }
     }
 }

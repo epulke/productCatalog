@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Products;
 
 use App\Model\Collections\ProductsCollection;
 use App\Model\Product;

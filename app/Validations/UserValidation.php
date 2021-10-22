@@ -4,17 +4,18 @@ namespace App\Validations;
 
 use App\Exceptions\UserValidationException;
 use App\Model\User;
-use App\Repositories\MySqlUsersRepository;
+use App\Repositories\Users\MySqlUsersRepository;
+use DI\Container;
 
 class UserValidation
 {
     private array $errors = [];
     private MySqlUsersRepository $repository;
 
-    public function __construct(?array $errors = [])
+    public function __construct(Container $container,?array $errors = [])
     {
         $this->errors = $errors;
-        $this->repository = new MySqlUsersRepository();
+        $this->repository = $container->get(MySqlUsersRepository::class);
     }
 
     public function getErrors(): ?array

@@ -1,6 +1,7 @@
 <?php
 
 use App\View;
+use DI\Container;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -38,6 +39,18 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
 $twig = new Environment(new FilesystemLoader("app/View"), []);
 
+$container = new Container();
+
+//$container = new Container([
+//    MySqlProductsRepository::class => new MySqlProductsRepository(),
+//    MySqlProductsTagsRepository::class => new MySqlProductsTagsRepository(),
+//    MySqlTagsRepository::class => new MySqlTagsRepository(),
+//    MySqlUsersRepository::class => new MySqlUsersRepository(),
+//    ProductFormValidation::class => new ProductFormValidation(),
+//    UserValidation::class => new UserValidation(),
+//
+//]);
+
 
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -68,14 +81,15 @@ switch ($routeInfo[0]) {
         {
             foreach ($middlewares[$handler] as $middleware)
             {
-                $middleware = new $middleware;
+                $middleware = $container->get($middleware);
                 $middleware->handle();
             }
         }
 
         [$handler, $method] = explode("@", $handler);
+
         $path = "App\Controllers\\" . $handler;
-        $controller = new $path();
+        $controller = $container->get($path);
         $response = $controller->$method($vars);
 
         if ($response instanceof View)

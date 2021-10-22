@@ -3,30 +3,30 @@
 namespace App\Controllers;
 
 use App\Auth;
-use App\Exceptions\ProductValidationException;
 use App\Model\Product;
 use App\Redirect;
-use App\Repositories\MySqlProductsRepository;
-use App\Repositories\MySqlProductsTagsRepository;
-use App\Repositories\MySqlTagsRepository;
-use App\Validations\ProductFormValidation;
+use App\Repositories\Products\MySqlProductsRepository;
+use App\Repositories\ProductsTags\MySqlProductsTagsRepository;
+use App\Repositories\Tags\MySqlTagsRepository;
+use App\Repositories\Products\ProductsRepository;
+use App\Repositories\ProductsTags\ProductsTagsRepository;
+use App\Repositories\Tags\TagsRepository;
 use App\View;
 use Carbon\Carbon;
+use DI\Container;
 use Ramsey\Uuid\Uuid;
 
 class ProductsController
 {
-    private MySqlProductsRepository $productsRepository;
-    private ProductFormValidation $validator;
-    private MySqlProductsTagsRepository $productsTagsRepository;
-    private MySqlTagsRepository $tagsRepository;
+    private ProductsRepository $productsRepository;
+    private ProductsTagsRepository $productsTagsRepository;
+    private TagsRepository $tagsRepository;
 
-    public function __construct()
+    public function __construct(Container $container)
     {
-        $this->productsRepository = new MySqlProductsRepository();
-        $this->validator = new ProductFormValidation();
-        $this->productsTagsRepository = new MySqlProductsTagsRepository();
-        $this->tagsRepository = new MySqlTagsRepository();
+        $this->productsRepository = $container->get(MySqlProductsRepository::class);
+        $this->productsTagsRepository = $container->get(MySqlProductsTagsRepository::class);
+        $this->tagsRepository = $container->get(MySqlTagsRepository::class);
     }
 
     public function index(): View
@@ -106,7 +106,6 @@ class ProductsController
     {
         $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
 
-        $this->validator->productFieldsValidation($_POST);
         $this->productsRepository->editProduct($vars["id"], $_POST, Auth::user()->getId());
         Redirect::url("/products");
     }

@@ -12,7 +12,6 @@ class AuthorizedMiddleware implements Middleware
         if (!Auth::loggedIn())
         {
             Redirect::url("/login");
-            exit;
         }
     }
 }

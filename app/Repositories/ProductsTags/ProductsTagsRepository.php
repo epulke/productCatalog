@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\ProductsTags;
 
 use App\Model\Collections\TagsCollection;
 

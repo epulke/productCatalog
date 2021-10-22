@@ -3,23 +3,21 @@
 namespace App\Controllers;
 
 use App\Auth;
-use App\Exceptions\UserValidationException;
 use App\Model\User;
 use App\Redirect;
-use App\Repositories\MySqlUsersRepository;
-use App\Validations\UserValidation;
+use App\Repositories\Users\MySqlUsersRepository;
+use App\Repositories\Users\UsersRepository;
 use App\View;
 use Ramsey\Uuid\Uuid;
+use DI\Container;
 
 class UsersController
 {
-    private MySqlUsersRepository $repository;
-    private UserValidation $validation;
+    private UsersRepository $repository;
 
-    public function __construct()
+    public function __construct(Container $container)
     {
-        $this->repository = new MySqlUsersRepository();
-        $this->validation = new UserValidation();
+        $this->repository = $container->get(MySqlUsersRepository::class);
     }
 
     public function registerForm(): View
