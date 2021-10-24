@@ -41,17 +41,6 @@ $twig = new Environment(new FilesystemLoader("app/View"), []);
 
 $container = new Container();
 
-//$container = new Container([
-//    MySqlProductsRepository::class => new MySqlProductsRepository(),
-//    MySqlProductsTagsRepository::class => new MySqlProductsTagsRepository(),
-//    MySqlTagsRepository::class => new MySqlTagsRepository(),
-//    MySqlUsersRepository::class => new MySqlUsersRepository(),
-//    ProductFormValidation::class => new ProductFormValidation(),
-//    UserValidation::class => new UserValidation(),
-//
-//]);
-
-
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];

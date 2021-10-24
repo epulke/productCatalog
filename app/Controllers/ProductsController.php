@@ -88,6 +88,8 @@ class ProductsController
     public function deleteProduct($vars)
     {
         if ($_POST["delete"] === "Delete") {
+            $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
+            $this->productsTagsRepository->delete($product);
             $this->productsRepository->deleteProduct($vars["id"], Auth::user()->getId());
             Redirect::url("/products");
         }
@@ -95,18 +97,28 @@ class ProductsController
 
     public function showEditView($vars): View
     {
+        $tags = $this->tagsRepository->getTags();
         $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
         return new View("productEdit.view.twig", [
             "product" => $product,
+            "tags" => $tags->getTags(),
             "errors" => $_SESSION["_errors"] ?? null
         ]);
     }
 
     public function editProduct($vars)
     {
-        $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
-
+        $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
+        $this->productsTagsRepository->delete($product);
         $this->productsRepository->editProduct($vars["id"], $_POST, Auth::user()->getId());
+        $tags = $this->tagsRepository->getTags();
+        $selectedTags = [];
+        foreach ($tags->getTags() as $tag) {
+            if (in_array((string)$tag->getId(), $_POST)) {
+                $selectedTags[] = $tag->getId();
+            }
+        }
+        $this->productsTagsRepository->saveProductsTags($product, $selectedTags);
         Redirect::url("/products");
     }
 

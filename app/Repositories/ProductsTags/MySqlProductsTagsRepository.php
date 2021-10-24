@@ -43,7 +43,7 @@ class MySqlProductsTagsRepository implements ProductsTagsRepository
         return $collection;
     }
 
-    public function saveProductsTags(Product $product, array $tags)
+    public function saveProductsTags(Product $product, array $tags): void
     {
         foreach ($tags as $tag)
         {
@@ -55,6 +55,13 @@ class MySqlProductsTagsRepository implements ProductsTagsRepository
                 ":tagId" => $tag
             ]);
         }
+    }
 
+    public function delete(Product $product): void
+    {
+        $statement = $this->connection->prepare(
+            "delete from productsTags where productId='{$product->getProductId()}'"
+        );
+        $statement->execute();
     }
 }

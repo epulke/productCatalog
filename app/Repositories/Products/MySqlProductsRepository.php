@@ -93,21 +93,10 @@ class MySqlProductsRepository implements ProductsRepository
 
     public function saveProduct(Product $product): void
     {
-        $statement = $this->connection->prepare("insert into products (
-                      productId,
-                      name, 
-                      category, 
-                      quantity, 
-                      dateAdded,
-                      userId
-                      ) values (
-                                :productId,
-                                :name, 
-                                :category, 
-                                :quantity, 
-                                :dateAdded,
-                                :userId
-                      )");
+        $statement = $this->connection->prepare(
+            "insert into products (productId, name, category, quantity, dateAdded,userId) 
+                    values (:productId, :name, :category, :quantity, :dateAdded,:userId)"
+        );
         $statement->execute([
             ":productId" => $product->getProductId(),
             ":name" => $product->getName(),
