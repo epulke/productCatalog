@@ -10,9 +10,9 @@
             <input type="text" id="name" name="name" required><br>
             <label for="category" class="text-right mb-5 mx-1 mx-md-4 mt-4"><b>Category:</b></label>
             <select id="category" name="category" required>
-                <option value="Footwear">Footwear</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Accessories">Accessories</option>
+                {% for category in categories %}
+                    <option value="{{ category.getName }}">{{ category.getName }}</option>
+                {% endfor %}
             </select><br>
             <label for="quantity" class="text-right mb-5 mx-1 mx-md-4 mt-4"><b>Quantity:</b></label>
             <input type="text" id="quantity" name="quantity" required><br>

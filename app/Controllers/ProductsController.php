@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Auth;
 use App\Model\Product;
 use App\Redirect;
+use App\Repositories\Categories\CategoriesRepository;
+use App\Repositories\Categories\MySqlCategoriesRepository;
 use App\Repositories\Products\MySqlProductsRepository;
 use App\Repositories\ProductsTags\MySqlProductsTagsRepository;
 use App\Repositories\Tags\MySqlTagsRepository;
@@ -21,22 +23,25 @@ class ProductsController
     private ProductsRepository $productsRepository;
     private ProductsTagsRepository $productsTagsRepository;
     private TagsRepository $tagsRepository;
+    private CategoriesRepository $categoriesRepository;
 
     public function __construct(Container $container)
     {
         $this->productsRepository = $container->get(MySqlProductsRepository::class);
         $this->productsTagsRepository = $container->get(MySqlProductsTagsRepository::class);
         $this->tagsRepository = $container->get(MySqlTagsRepository::class);
+        $this->categoriesRepository = $container->get(MySqlCategoriesRepository::class);
     }
 
     public function index(): View
     {
         $products = $this->productsRepository->downloadProducts(Auth::user()->getId());
-
+        $categories = $this->categoriesRepository->getAll();
         $tags = $this->tagsRepository->getTags();
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
             "user" => Auth::user(),
+            "categories" => $categories->getCategories(),
             "tags" => $tags->getTags()
         ]);
     }
@@ -54,9 +59,11 @@ class ProductsController
 
     public function createNewForm(): View
     {
+        $categories = $this->categoriesRepository->getAll();
         $tags = $this->tagsRepository->getTags();
         return new View("createNew.view.twig", [
             "errors" => $_SESSION["_errors"] ?? null,
+            "categories" => $categories->getCategories(),
             "tags" => $tags->getTags()
         ]);
     }
@@ -97,10 +104,12 @@ class ProductsController
 
     public function showEditView($vars): View
     {
+        $categories = $this->categoriesRepository->getAll();
         $tags = $this->tagsRepository->getTags();
         $product = $this->productsRepository->searchProduct($vars["id"], Auth::user()->getId());
         return new View("productEdit.view.twig", [
             "product" => $product,
+            "categories" => $categories->getCategories(),
             "tags" => $tags->getTags(),
             "errors" => $_SESSION["_errors"] ?? null
         ]);
@@ -131,11 +140,12 @@ class ProductsController
                 $selectedTags[] = $tag->getId();
             }
         }
-
+        $categories = $this->categoriesRepository->getAll();
         $products = $this->productsRepository->downloadProducts(Auth::user()->getId(), $_GET["category"], $selectedTags);
         return new View("productsCatalog.view.twig", [
             "products" => $products->getProducts(),
             "user" => Auth::user(),
+            "categories" => $categories->getCategories(),
             "tags" => $tags->getTags()
         ]);
     }

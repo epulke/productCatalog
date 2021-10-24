@@ -14,9 +14,12 @@
                 <label for="number">Filter Category:</label>
                 <select id="category" name="category">
                     <option value="all">All</option>
-                    <option value="Footwear">Footwear</option>
-                    <option value="Clothing">Clothing</option>
-                    <option value="Accessories">Accessories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.getName }}">{{ category.getName }}</option>
+                    {% endfor %}
+                    {# <option value="Footwear">Footwear</option> #}
+                    {# <option value="Clothing">Clothing</option> #}
+                    {# <option value="Accessories">Accessories</option> #}
                 </select>
                 <br>
                 {% for tag in tags %}

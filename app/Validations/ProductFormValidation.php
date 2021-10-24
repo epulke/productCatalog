@@ -3,10 +3,20 @@
 namespace App\Validations;
 
 use App\Exceptions\ProductValidationException;
+use App\Repositories\Categories\CategoriesRepository;
+use App\Repositories\Categories\MySqlCategoriesRepository;
+use DI\Container;
 
 class ProductFormValidation
 {
-    private array $errors = [];
+    private ?array $errors = [];
+    private CategoriesRepository $categoriesRepository;
+
+    public function __construct(?array $errors = [], Container $container)
+    {
+        $this->errors = $errors;
+        $this->categoriesRepository = $container->get(MySqlCategoriesRepository::class);
+    }
 
     public function getErrors(): array
     {
@@ -26,13 +36,12 @@ class ProductFormValidation
             $this->errors[] = "Quantity should be number and it should be greater than 0.";
         }
 
-        $category = ["Footwear", "Clothing", "Accessories"];
+        $category = $this->categoriesRepository->getAll()->getCategoriesArray();
         if (!in_array($data["category"], $category))
         {
             $this->errors[] = "This is invalid category.";
         }
 
         if (count($this->errors) > 0) throw new ProductValidationException();
-
     }
 }
