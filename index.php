@@ -1,7 +1,19 @@
 <?php
 
+use App\Repositories\Categories\CategoriesRepository;
+use App\Repositories\Categories\MySqlCategoriesRepository;
+use App\Repositories\Products\MySqlProductsRepository;
+use App\Repositories\Products\ProductsRepository;
+use App\Repositories\ProductsTags\MySqlProductsTagsRepository;
+use App\Repositories\ProductsTags\ProductsTagsRepository;
+use App\Repositories\Tags\MySqlTagsRepository;
+use App\Repositories\Tags\TagsRepository;
+use App\Repositories\Users\MySqlUsersRepository;
+use App\Repositories\Users\UsersRepository;
 use App\View;
 use DI\Container;
+use DI\ContainerBuilder;
+use Psr\Container\ContainerInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -33,13 +45,28 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute('GET', '/user', 'UsersController@userInfo');
     $r->addRoute('POST', '/user', 'UsersController@userLogOut');
-
-
 });
 
 $twig = new Environment(new FilesystemLoader("app/View"), []);
 
 $container = new Container();
+//$container->set(PDO::class, DI\factory(function () {
+//    $config = require "config.php";
+//    $dsn = $config["connection"].";dbname=".$config["name"];
+//    return new PDO($dsn, $config["username"], $config["password"], $config["options"]);
+//}));
+//var_dump($container->get(PDO::class));
+//$container->set(UsersRepository::class, DI\factory(function (ContainerInterface $c) {
+//    var_dump("I was here");
+//    return new MySqlUsersRepository($c->get(PDO::class));
+//}));
+$container->set(UsersRepository::class, DI\create(MySqlUsersRepository::class));
+$container->set(ProductsRepository::class, DI\create(MySqlProductsRepository::class));
+$container->set(TagsRepository::class, DI\create(MySqlTagsRepository::class));
+$container->set(ProductsTagsRepository::class, DI\create(MySqlProductsTagsRepository::class));
+$container->set(CategoriesRepository::class, DI\create(MySqlCategoriesRepository::class));
+
+
 
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];

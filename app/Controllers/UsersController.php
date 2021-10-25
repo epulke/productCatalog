@@ -3,21 +3,21 @@
 namespace App\Controllers;
 
 use App\Auth;
-use App\Model\User;
 use App\Redirect;
-use App\Repositories\Users\MySqlUsersRepository;
-use App\Repositories\Users\UsersRepository;
+use App\Services\Users\LoginUserService;
+use App\Services\Users\RegisterUserRequest;
+use App\Services\Users\RegisterUserService;
 use App\View;
-use Ramsey\Uuid\Uuid;
-use DI\Container;
 
 class UsersController
 {
-    private UsersRepository $repository;
+    private RegisterUserService $registerService;
+    private LoginUserService $loginService;
 
-    public function __construct(Container $container)
+    public function __construct(RegisterUserService $registerService, LoginUserService $loginService)
     {
-        $this->repository = $container->get(MySqlUsersRepository::class);
+        $this->registerService = $registerService;
+        $this->loginService = $loginService;
     }
 
     public function registerForm(): View
@@ -27,13 +27,7 @@ class UsersController
 
     public function registerUser()
     {
-        $user = new User(
-            Uuid::uuid4()->toString(),
-            $_POST["name"],
-            $_POST["email"],
-            password_hash($_POST["password"], PASSWORD_DEFAULT)
-        );
-        $this->repository->addUser($user);
+        $this->registerService->execute(new RegisterUserRequest($_POST["name"], $_POST["email"], $_POST["password"]));
         Redirect::url("/login");
     }
 
@@ -44,7 +38,7 @@ class UsersController
 
     public function logInUser()
     {
-        $user = $this->repository->findByEmail($_POST["email"]);
+        $user = $this->loginService->execute($_POST["email"]);
         $_SESSION["userId"] = $user->getId();
         Redirect::url("/products");
     }

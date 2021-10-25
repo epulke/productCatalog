@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\User;
 use App\Repositories\Users\MySqlUsersRepository;
+use DI\Container;
 
 class Auth
 {
